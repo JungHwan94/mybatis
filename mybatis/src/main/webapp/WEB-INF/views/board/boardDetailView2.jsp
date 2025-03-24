@@ -59,13 +59,11 @@
 					</tr>
 				</c:when>
 				<c:otherwise>
-				<form id="rFrm">
 					<tr>
 						<th width="100">댓글작성</th>
 						<th width="400"><textarea cols="53" rows="3" readonly>로그인 후 이용 가능한 서비스입니다</textarea></th>
 						<th width="100"><button disabled>등록</button></th>
 					</tr>
-					</form>
 				</c:otherwise>
 			</c:choose>
 			<c:choose>
@@ -97,8 +95,6 @@
 	<script>
 		$(() => {
 			$('#replyInsert').click(function() {
-				// serialize(): 폼안의 input, select, texttarea등의 value의 값을
-				// content = 내용&id=&writer=값
 				$.ajax({
 					url: 'detail.bo',
 					data: {
@@ -115,27 +111,6 @@
 					}
 				})
 			})
-			function replyList() {
-				$.ajax({
-					url: "detail.bo"
-					data: {bno: ${b.boardNo}},
-					type: "post",
-					success: function(result) {
-						console.log(result);
-						$.each(result, function(index, value) {
-							list += "<tr>"
-									+ "<td>" + value.replyWriter + "</td>"
-									+ "<td>" + value.replyContent + "</td>"
-									+ "<td>" + value.createDate + "</td>"
-									+ "</tr>";
-						})
-						$('#replyList').html(list);
-					},
-					error: function() {
-						console.log('댓글등록 후 리스트 목록 통신 실패')
-					}
-				})
-			}
 		})
 	</script>
 </body>
