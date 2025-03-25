@@ -55,11 +55,11 @@ public class BoardServiceImpl implements BoardService {
 		sqlSession.close();
 		return list;
 	}
-	
+
 	@Override
 	public int selectSearchCount(HashMap<String, String> map) {
 		SqlSession sqlSession = Template.getSqlSession();
-		int result = bDao.selectReplyList(sqlSession, map);
+		int result = bDao.selectSearchCount(sqlSession, map);
 		sqlSession.close();
 		return result;
 	}
@@ -67,16 +67,20 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public ArrayList<Board> selectSearchList(HashMap<String, String> map, PageInfo pi) {
 		SqlSession sqlSession = Template.getSqlSession();
-		ArrayList<Board> list = bDao.selectReplyList(sqlSession, map, pi);
+		ArrayList<Board> list = bDao.selectSearchList(sqlSession, map, pi);
 		sqlSession.close();
 		return list;
 	}
-	
+
 	@Override
 	public int replyInsert(Reply r) {
 		SqlSession sqlSession = Template.getSqlSession();
 		int result = bDao.replyInsert(sqlSession, r);
+		if(result > 0) {
+			sqlSession.commit();
+		}
 		sqlSession.close();
 		return result;
 	}
+
 }

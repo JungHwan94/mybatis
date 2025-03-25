@@ -53,8 +53,8 @@
 		   and status = 'Y'
 		 order by reply_no desc  
 	</select>
-	
-	<select id="selectSearchCount">
+
+	<select id="selectSearchCount" resultType="_int">
 		select count(*)
 		  from board
 		 where status = 'Y'
@@ -67,27 +67,10 @@
 		 <if test="keyField == 'content'">
 		 	and board_content
 		 </if>
-		 like '%' || #{keyWord} || '%'
-		 
-		<!-- 
-		select count(*)
-		  from board
-		 where status = 'Y'
-			and board_writer like %김%
-			
-		select count(*)
-		  from board
-		 where status = 'Y'
-			and board_title like %제목%
-			
-		select count(*)
-		  from board
-		 where status = 'Y'
-			and board_content like %it%
-			 -->
+		 like '%' || #{keyWord} || '%'    
 	</select>
-	
-	<select id="selectSearchList">
+
+	<select id="selectSearchList" resultMap="boardResultSet">
 		select *
 		  from board
 		 where status = 'Y'
@@ -102,12 +85,11 @@
 		 		and board_content
 		 	</otherwise>
 		 </choose>
-		 like '%' || #{keyWord} || '%'
-		 order by board_no desc
+		 like '%' || #{keyWord} || '%' 
+		 order by board_no desc   
 	</select>
 	
 	<insert id="replyInsert">
-		insert into reply values(seq_ron.nextval, #{replyContent}, ${refBno}, ${replyWriter}, default, default)
+		insert into reply values(seq_rno.nextval, #{replyContent}, #{refBoardNo}, #{replyWriter}, default, default)
 	</insert>
-	
 </mapper>

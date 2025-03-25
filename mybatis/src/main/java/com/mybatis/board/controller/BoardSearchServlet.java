@@ -31,10 +31,19 @@ public class BoardSearchServlet extends HttpServlet {
 		map.put("keyWord", keyWord);
 		
 		BoardService bService = new BoardServiceImpl();
+		
 		// 페이지 처리를 위해 검색조건에 맞는 모든 게시글의 총 갯수
 		int searchCount = bService.selectSearchCount(map);
 		PageInfo pi = Pagination.getPageInfo(searchCount, nowPage, 5, 2);
 		ArrayList<Board> list = bService.selectSearchList(map, pi);
+		
+		request.setAttribute("pi", pi);
+		request.setAttribute("list", list);
+		
+		request.setAttribute("keyField", keyField);
+		request.setAttribute("keyWord", keyWord);
+		
+		request.getRequestDispatcher("WEB-INF/views/board/boardListView.jsp").forward(request, response);
 	}
 
 }

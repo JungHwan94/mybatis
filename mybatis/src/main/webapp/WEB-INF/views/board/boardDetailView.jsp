@@ -5,8 +5,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<title>게시판 상세보기</title>
 <style>
 	.outer table {
 		border: 1px solid;
@@ -16,6 +16,7 @@
 		border: 1px solid;
 	}
 </style>
+
 </head>
 <body>
 	<jsp:include page="../common/menubar.jsp" />
@@ -49,90 +50,82 @@
 			</tr>
 		</table>
 		<br>
-		
-		<c:choose>
-				<c:when test="${loginUser != null}">
+		<table align="center">
+			<c:choose>
+				<c:when test="${ empty loginUser }">
 					<tr>
-						<th width="100">댓글작성</th>
-						<th width="400"><textarea cols="53" rows="3" id="replyContent"></textarea></th>
-						<th width="100"><button id="replyInsert">등록</button></th>
+						<td>댓글 작성</td>
+						<td><textarea row="3" cols="50" readonly>로그인 후 이용가능한 서비스 입니다.</textarea></td>
+						<td><input type="button" value="댓글작성" disabled></td>
 					</tr>
 				</c:when>
 				<c:otherwise>
-				<form id="rFrm">
-					<tr>
-						<th width="100">댓글작성</th>
-						<th width="400"><textarea cols="53" rows="3" readonly>로그인 후 이용 가능한 서비스입니다</textarea></th>
-						<th width="100"><button disabled>등록</button></th>
-					</tr>
+					<form id="rFrm">
+						<tr>
+							<td>댓글 작성</td>
+							<td><textarea row="3" cols="50" name="content"></textarea></td>
+							<td><input type="button" value="댓글작성" id="replyInsert"></td>
+							<input type="hidden" name="bno" value="${b.boardNo}">
+							<input type="hidden" name="writer" value="${loginUser.userId}">
+						</tr>
 					</form>
 				</c:otherwise>
 			</c:choose>
-			<c:choose>
-				<c:when test="${rlist.size() > 0}">
-					<tr>
-						<th colspan="3" style="text-align:center">댓글(${rlist.size()})</th>
-					</tr>
-				</c:when>
-				<c:otherwise>
-					<tr>
-						<th colspan="3" style="text-align:center">댓글이 없습니다</th>
-					</tr>
-				</c:otherwise>
-			</c:choose>
-			
 			<tr>
 				<td colspan="3" style="text-align:center">댓글 : ${reply.size()}</td>
 			</tr>
-			<c:forEach var="r" items="${reply}">
-				<tr>
-					<td>${r.replyWriter}</td>
-					<td>${r.replyContent}</td>
-					<td>${r.createDate}</td>
-				</tr>
-			</c:forEach>
+			<tbody id="replyList">
+				<c:forEach var="r" items="${reply}">
+					<tr>
+						<td>${r.replyWriter}</td>
+						<td>${r.replyContent}</td>
+						<td>${r.createDate}</td>
+					</tr>
+				</c:forEach>
+			</tbody>
 		</table>
 	</div>
 	
 	<script>
 		$(() => {
 			$('#replyInsert').click(function() {
-				// serialize(): 폼안의 input, select, texttarea등의 value의 값을
-				// content = 내용&id=&writer=값
+				// serialize() : 폼안의 input, select, textarea등의 value의 값을 간단하게 표준 url인코딩 형태 문자열로 만들어줌
+				// content=내용&id=값&writer=값
+				let rdata = $('#rFrm').serialize();
 				$.ajax({
-					url: 'detail.bo',
-					data: {
-						bno: ${b.boardNo},
-						content: ${'#content'}.val(),
-						writer: ${loginUser.userName}
-					},
-					type: 'post',
+					url : 'rinsert.bo',
+					data : rdata,
 					success: function(result) {
 						console.log(result);
+						if(result > 0) {
+							replyList();
+						}
 					},
 					error: function() {
-						console.log("실패");
+						console.log("댓글달기 통신 실패");
 					}
 				})
 			})
+			
 			function replyList() {
-				$.ajax({
-					url: "detail.bo"
-					data: {bno: ${b.boardNo}},
+				$.ajax ({
+					url : "detail.bo",
+					data : {bno : ${b.boardNo}},
 					type: "post",
-					success: function(result) {
+					success : function(result) {
 						console.log(result);
+						let list = "";
 						$.each(result, function(index, value) {
 							list += "<tr>"
-									+ "<td>" + value.replyWriter + "</td>"
-									+ "<td>" + value.replyContent + "</td>"
-									+ "<td>" + value.createDate + "</td>"
-									+ "</tr>";
+									+ "<td>"+ value.replyWriter +"</td>"
+									+ "<td>"+ value.replyContent + "</td>"
+									+ "<td>"+ value.createDate + "</td>"
+								  + "</tr>";
 						})
 						$('#replyList').html(list);
 					},
-					error: function() {
-						console.log('댓글등록 후 리스트 목록 통신 실패')
+					error : function() {
+						console.log('댓글등록 후 리스트 목록 통신 실패');
 					}
 				})
 			}
